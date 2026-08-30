@@ -2,7 +2,7 @@
 
 无需重启 pi，即可强制完整重绘 TUI 界面。适用于终端显示错位、残影或内容未正确刷新的情况。
 
-> Force a full [Pi](https://github.com/badlogic/pi-mono) TUI redraw without restarting Pi. Fixes garbled screens, stale text and misaligned rendering — press `F5` or run `/redraw`, and the running agent is never interrupted.
+[English](README.en.md)
 
 ## 功能
 
