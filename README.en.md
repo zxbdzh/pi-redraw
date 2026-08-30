@@ -1,22 +1,38 @@
-# pi-redraw
+<div align="center">
 
-Force a full [Pi](https://github.com/badlogic/pi-mono) TUI redraw without restarting Pi. Useful when the terminal display gets garbled, leaves artifacts, or fails to refresh.
+# pi-redraw
 
 [中文](README.md)
 
+**Force a full Pi TUI redraw without restarting Pi.**
+
+<sub>// The rescue key for garbled screens, artifacts and stale rendering — never interrupts the running agent</sub>
+
+<br />
+
+![Pi](https://img.shields.io/badge/Pi-%E2%89%A50.84.3-00f5ff)
+![Trigger](https://img.shields.io/badge/trigger-F5%20%7C%20%2Fredraw-ffa500)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+</div>
+
+---
+
+## The problem
+
+While pi runs long tasks, the terminal occasionally garbles, leaves artifacts, or fails to refresh — previously the only option was quitting and reopening, losing the whole session. pi-redraw gives you one full redraw: the agent keeps running, nothing is lost.
+
 ## Features
 
-- Press `F5` to force a full redraw of the Pi UI
-- Also available as the `/redraw` command
-- `Ctrl+Shift+R` works in terminals that support the enhanced keyboard protocol
+- `F5` forces a full redraw (default, best compatibility)
+- `/redraw` command
+- `Ctrl+Shift+R` in terminals with the enhanced keyboard protocol
 - Shows a `TUI redrawn` notification on success
-- Never interrupts the running agent
-- Never touches editor content, session data, or scroll position
-- Never reloads extensions, skills, themes, or context files
+- ❌ Never interrupts the running agent
+- ❌ Never touches editor content, session data, or scroll position
+- ❌ Never reloads extensions, skills, themes, or context files
 
 ## Usage
-
-Press in Pi:
 
 ```text
 F5
@@ -28,19 +44,15 @@ Or run in the editor:
 /redraw
 ```
 
-Internally the extension calls `TUI.requestRender(true)`, resetting Pi's render state and scheduling one full redraw immediately.
-
-> Most terminals using the legacy keyboard protocol cannot distinguish `Ctrl+Shift+R` from `Ctrl+R`, which is why `F5` is the default and more compatible shortcut.
+> Most terminals using the legacy keyboard protocol cannot distinguish `Ctrl+Shift+R` from `Ctrl+R`, which is why `F5` is the default.
 
 ## Install
-
-Install globally from GitHub inside Pi:
 
 ```bash
 pi install git:github.com/zxbdzh/pi-redraw
 ```
 
-Then run `/reload` in an open Pi session, or start a new one.
+Then `/reload` in an open session, or start a new one.
 
 Uninstall:
 
@@ -48,13 +60,25 @@ Uninstall:
 pi remove git:github.com/zxbdzh/pi-redraw
 ```
 
-## Try locally
-
-Clone the repo and run from the project directory:
+### Try locally
 
 ```bash
 pi -e ./src/index.ts
 ```
+
+## How it works
+
+Pi's extension UI API does not expose a global redraw method directly. The extension registers a zero-height widget that takes no screen space, obtains the current `TUI` instance through the widget factory, and calls:
+
+```typescript
+tui.requestRender(true);
+```
+
+The `true` argument clears the existing render state so the next frame performs a full redraw. Stale TUI references are cleaned up on session close, switch, or reload.
+
+## Compatibility
+
+Requires Pi `0.84.3` or newer.
 
 ## Development
 
@@ -63,20 +87,6 @@ npm install
 npm test
 npm run typecheck
 ```
-
-## How it works
-
-Pi's extension UI API does not expose a global redraw method directly. The extension registers a zero-height widget that takes no screen space, obtains the current `TUI` instance through the widget factory, and calls this when the hotkey or command fires:
-
-```typescript
-tui.requestRender(true);
-```
-
-The `true` argument clears the existing render state so the next frame performs a full redraw. The extension cleans up stale TUI references on session close, switch, or reload to avoid touching invalidated session instances.
-
-## Compatibility
-
-Requires Pi `0.84.3` or newer.
 
 ## License
 
